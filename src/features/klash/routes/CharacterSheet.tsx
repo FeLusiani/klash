@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
-import { parseAndRoll, RollResult } from '../../../lib/dice';
+import { parseAndRoll, type RollResult } from '../../../lib/dice';
 import './CharacterSheet.css';
 
 export const CharacterSheet: React.FC = () => {

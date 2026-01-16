@@ -17,9 +17,9 @@
 
 /* Roll Result Display */
 .roll-result {
-    background: var(--color-brand-light);
+    background: var(--color-surface-accent);
     border: 2px solid var(--color-brand);
-    color: var(--color-brand-dark);
+    color: var(--color-text-accent);
     padding: var(--space-md);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-lg);
