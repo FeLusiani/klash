@@ -31,6 +31,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
 }
 
 .ability-card {
@@ -55,4 +56,26 @@
     font-weight: 700;
     font-family: var(--font-mono);
     color: var(--color-brand);
+}
+
+.sheet-actions {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: var(--space-xl);
+    display: flex;
+    justify-content: center;
+}
+
+.btn-danger {
+    background-color: transparent;
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: var(--color-danger);
+    color: white;
 }

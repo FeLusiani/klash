@@ -1,5 +1,6 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
@@ -7,9 +8,23 @@ import './CharacterSheet.css';
 
 export const CharacterSheet: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const character = useLiveQuery(() =>
         id ? db.characters.get(Number(id)) : undefined
         , [id]);
+
+    const handleDelete = async () => {
+        if (!character?.id) return;
+        if (window.confirm('Are you sure you want to delete this character? This action cannot be undone.')) {
+            try {
+                await db.characters.delete(character.id);
+                navigate('/');
+            } catch (error) {
+                console.error('Failed to delete character:', error);
+                alert('Failed to delete character');
+            }
+        }
+    };
 
     if (!character) {
         return (
@@ -38,6 +53,15 @@ export const CharacterSheet: React.FC = () => {
                         </div>
                     ))}
                 </section>
+
+                <footer className="sheet-actions">
+                    <button
+                        className="btn-danger"
+                        onClick={handleDelete}
+                    >
+                        Delete Character
+                    </button>
+                </footer>
             </div>
         </Layout>
     );
