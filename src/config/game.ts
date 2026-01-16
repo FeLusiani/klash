@@ -16,3 +16,6 @@ export const GAME_CONFIG = {
     // Dice available at character creation
     creationDice: ['d4', 'd6', 'd8', 'd10'] as Die[]
 };
+
+// Increment this to wipe data on client update
+export const DATA_VERSION = 1;
