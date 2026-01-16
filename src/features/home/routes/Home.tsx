@@ -35,6 +35,9 @@ export const Home: React.FC = () => {
                                 <Link key={char.id} to={`/characters/${char.id}`} className="character-card">
                                     <h2>{char.name}</h2>
                                     <div className="stats-preview">
+                                        <div className="hp-preview">
+                                            HP: {char.currentHp ?? char.hp ?? 0}/{char.maxHp ?? char.hp ?? 0}
+                                        </div>
                                         {Object.entries(char.abilities).map(([code, die]) => (
                                             <span key={code} className="stat-badge">
                                                 {code}: {die}
