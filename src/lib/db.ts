@@ -1,22 +1,21 @@
 import Dexie, { type Table } from 'dexie';
 
-// Define the interface for the persistent data
-export interface Todo {
+export interface Character {
     id?: number;
-    title: string;
-    completed: boolean;
+    name: string;
+    abilities: Record<string, string>; // e.g. { STR: 'd4', DEX: 'd6' }
     createdAt: number;
 }
 
 export class AppDatabase extends Dexie {
-    todos!: Table<Todo>;
+    characters!: Table<Character>;
 
     constructor() {
-        super('OfflinePWA');
+        super('KlashOfflinePWA');
 
         // Define schema
         this.version(1).stores({
-            todos: '++id, completed, createdAt' // Primary key and indexed props
+            characters: '++id, name, createdAt'
         });
     }
 }

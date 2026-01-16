@@ -1,0 +1,40 @@
+.sheet-header {
+    margin-bottom: var(--space-xl);
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: var(--space-md);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+}
+
+.abilities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: var(--space-md);
+}
+
+.ability-card {
+    background: var(--color-surface);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.ability-code {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xs);
+    font-weight: 600;
+}
+
+.ability-value {
+    display: block;
+    font-size: var(--size-step-3);
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--color-brand);
+}

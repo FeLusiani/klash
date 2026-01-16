@@ -1,0 +1,59 @@
+.create-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.create-container h1 {
+    margin-bottom: var(--space-xl);
+}
+
+.form-group {
+    margin-bottom: var(--space-xl);
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+    color: var(--color-text-main);
+}
+
+.form-group input {
+    width: 100%;
+    padding: var(--space-md);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-md);
+    font-size: var(--size-step-1);
+}
+
+.form-group input:focus {
+    outline: 2px solid var(--color-brand);
+    border-color: transparent;
+}
+
+.abilities-section {
+    background: var(--color-surface);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.abilities-section h2 {
+    font-size: var(--size-step-1);
+    margin-bottom: var(--space-lg);
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-md);
+    margin-top: var(--space-2xl);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+}
