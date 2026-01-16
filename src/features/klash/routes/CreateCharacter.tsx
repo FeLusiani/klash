@@ -9,6 +9,7 @@ import './CreateCharacter.css';
 export const CreateCharacter: React.FC = () => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
+    const [hp, setHp] = useState(4);
     const [abilities, setAbilities] = useState<Record<string, Die>>({
         STR: 'd6',
         DEX: 'd6',
@@ -23,6 +24,7 @@ export const CreateCharacter: React.FC = () => {
             const id = await db.characters.add({
                 name,
                 abilities,
+                hp,
                 createdAt: Date.now()
             });
             navigate(`/characters/${id}`);
@@ -47,6 +49,19 @@ export const CreateCharacter: React.FC = () => {
                             placeholder="e.g. Grimold the Bold"
                             required
                             autoFocus
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="hp">Hit Points (1-8)</label>
+                        <input
+                            id="hp"
+                            type="number"
+                            min="1"
+                            max="8"
+                            value={hp}
+                            onChange={(e) => setHp(parseInt(e.target.value) || 4)}
+                            required
                         />
                     </div>
 

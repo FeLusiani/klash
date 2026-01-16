@@ -4,6 +4,7 @@ export interface Character {
     id?: number;
     name: string;
     abilities: Record<string, string>; // e.g. { STR: 'd4', DEX: 'd6' }
+    hp: number;
     createdAt: number;
 }
 

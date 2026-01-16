@@ -25,6 +25,9 @@ export const CharacterSheet: React.FC = () => {
                 <header className="sheet-header">
                     <Link to="/" className="back-link">← Back</Link>
                     <h1>{character.name}</h1>
+                    <div className="hp-badge">
+                        HP: {character.hp ?? '?'}
+                    </div>
                 </header>
 
                 <section className="abilities-grid">

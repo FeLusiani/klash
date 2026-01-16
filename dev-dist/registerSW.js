@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/klash/dev-sw.js?dev-sw', { scope: '/klash/', type: 'classic' })
