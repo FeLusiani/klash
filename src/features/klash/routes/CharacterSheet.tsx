@@ -247,6 +247,63 @@ export const CharacterSheet: React.FC = () => {
                     ))}
                 </section>
 
+                <section className="inventory-section">
+                    <div className="inventory-header">
+                        <h2>Inventory</h2>
+                        <button
+                            className="inventory-add-btn"
+                            onClick={async () => {
+                                if (!character?.id) return;
+                                const currentInventory = character.inventory || [];
+                                if (currentInventory.length >= 10) return;
+                                await db.characters.update(character.id, {
+                                    inventory: [...currentInventory, '']
+                                });
+                            }}
+                            disabled={(character.inventory || []).length >= 10}
+                            title="Add item (max 10)"
+                        >
+                            +
+                        </button>
+                    </div>
+                    <div className="inventory-list">
+                        {(character.inventory || []).map((item, index) => (
+                            <div key={index} className="inventory-item">
+                                <input
+                                    type="text"
+                                    className="inventory-input"
+                                    value={item}
+                                    onChange={async (e) => {
+                                        if (!character?.id) return;
+                                        const newInventory = [...(character.inventory || [])];
+                                        newInventory[index] = e.target.value;
+                                        await db.characters.update(character.id, {
+                                            inventory: newInventory
+                                        });
+                                    }}
+                                    placeholder="New item..."
+                                />
+                                <button
+                                    className="inventory-delete-btn"
+                                    onClick={async () => {
+                                        if (!character?.id) return;
+                                        const newInventory = (character.inventory || []).filter((_, i) => i !== index);
+                                        await db.characters.update(character.id, {
+                                            inventory: newInventory
+                                        });
+                                    }}
+                                    aria-label="Delete item"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
+                        {(character.inventory || []).length === 0 && (
+                            <p className="empty-message">No items in inventory</p>
+                        )}
+                    </div>
+                </section>
+
                 <footer className="sheet-actions">
                     <button
                         className="btn-danger"

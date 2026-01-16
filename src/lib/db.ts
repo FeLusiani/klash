@@ -12,6 +12,7 @@ export interface Character {
     maxHp: number;
     currentHp: number;
     hp?: number; // @deprecated
+    inventory?: string[];
     createdAt: number;
 }
 
