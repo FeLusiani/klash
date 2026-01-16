@@ -3,7 +3,8 @@
     margin: 0 auto;
 }
 
-.create-container h1 {
+h1 {
+    text-align: center;
     margin-bottom: var(--space-xl);
 }
 
@@ -11,49 +12,60 @@
     margin-bottom: var(--space-xl);
 }
 
-.form-group label {
+label {
     display: block;
-    font-weight: 600;
     margin-bottom: var(--space-xs);
-    color: var(--color-text-main);
+    font-weight: 600;
 }
 
-.form-group input {
+input[type="text"],
+input[type="number"] {
     width: 100%;
     padding: var(--space-md);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(0, 0, 0, 0.1);
     border-radius: var(--radius-md);
-    font-size: var(--size-step-1);
+    font-size: 1rem;
+    font-family: inherit;
 }
 
-.form-group input:focus {
-    outline: 2px solid var(--color-brand);
-    border-color: transparent;
-}
-
-.abilities-section {
-    background: var(--color-surface);
-    padding: var(--space-lg);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-xl);
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-brand);
 }
 
 .abilities-section h2 {
-    font-size: var(--size-step-1);
-    margin-bottom: var(--space-lg);
+    font-size: 1.25rem;
+    margin-bottom: var(--space-md);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: var(--space-xs);
 }
 
-.actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-md);
-    margin-top: var(--space-2xl);
-}
-
-.btn-secondary {
-    background: transparent;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: var(--space-sm) var(--space-lg);
+button[type="submit"] {
+    width: 100%;
+    padding: var(--space-md);
+    background-color: var(--color-brand);
+    color: white;
+    border: none;
     border-radius: var(--radius-md);
-    color: var(--color-text-muted);
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: var(--space-xl);
+    transition: background-color 0.2s;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--color-brand-dark);
+}
+
+.error-message {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+    border: 1px solid #fecaca;
+    font-weight: 500;
+    text-align: center;
 }

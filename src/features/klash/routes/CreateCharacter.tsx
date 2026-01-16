@@ -9,6 +9,7 @@ import './CreateCharacter.css';
 export const CreateCharacter: React.FC = () => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
+    const [error, setError] = useState<string | null>(null);
     const [hp, setHp] = useState(4);
     const [abilities, setAbilities] = useState<Record<string, Die>>({
         STR: 'd6',
@@ -21,8 +22,19 @@ export const CreateCharacter: React.FC = () => {
         if (!name.trim()) return;
 
         try {
+            // Check for duplicate name (case-insensitive)
+            const count = await db.characters
+                .where('name')
+                .equalsIgnoreCase(name.trim())
+                .count();
+
+            if (count > 0) {
+                setError('A character with this name is already present');
+                return;
+            }
+
             const id = await db.characters.add({
-                name,
+                name: name.trim(),
                 abilities,
                 maxHp: hp,
                 currentHp: hp,
@@ -31,8 +43,13 @@ export const CreateCharacter: React.FC = () => {
             navigate(`/characters/${id}`);
         } catch (error) {
             console.error('Failed to create character:', error);
-            alert('Failed to save character. Please try again.');
+            setError('Failed to save character. Please try again.');
         }
+    };
+
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setName(e.target.value);
+        if (error) setError(null);
     };
 
     return (
@@ -40,13 +57,14 @@ export const CreateCharacter: React.FC = () => {
             <div className="create-container">
                 <h1>New Character</h1>
                 <form onSubmit={handleSubmit}>
+                    {error && <div className="error-message">{error}</div>}
                     <div className="form-group">
                         <label htmlFor="name">Character Name</label>
                         <input
                             id="name"
                             type="text"
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={handleNameChange}
                             placeholder="e.g. Grimold the Bold"
                             required
                             autoFocus
