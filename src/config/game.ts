@@ -18,4 +18,4 @@ export const GAME_CONFIG = {
 };
 
 // Increment this to wipe data on client update
-export const DATA_VERSION = 1;
+export const DATA_VERSION = 2;

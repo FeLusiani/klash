@@ -42,9 +42,14 @@ export const CreateCharacter: React.FC = () => {
                 return;
             }
 
+            const formattedAbilities = Object.entries(abilities).reduce((acc, [code, value]) => ({
+                ...acc,
+                [code]: { current: value, max: value }
+            }), {});
+
             const id = await db.characters.add({
                 name: name.trim(),
-                abilities,
+                abilities: formattedAbilities as any, // Dexie will handle the object
                 maxHp: hp,
                 currentHp: hp,
                 createdAt: Date.now()

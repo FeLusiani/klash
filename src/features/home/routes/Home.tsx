@@ -38,9 +38,9 @@ export const Home: React.FC = () => {
                                         <div className="hp-preview">
                                             HP: {char.currentHp ?? char.hp ?? 0}/{char.maxHp ?? char.hp ?? 0}
                                         </div>
-                                        {Object.entries(char.abilities).map(([code, die]) => (
+                                        {Object.entries(char.abilities).map(([code, ability]) => (
                                             <span key={code} className="stat-badge">
-                                                {code}: {die}
+                                                {code}: {ability.max}
                                             </span>
                                         ))}
                                     </div>

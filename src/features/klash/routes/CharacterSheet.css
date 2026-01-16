@@ -205,11 +205,61 @@
 }
 
 .ability-value {
-    display: block;
     font-size: var(--size-step-3);
     font-weight: 700;
     font-family: var(--font-mono);
     color: var(--color-brand);
+}
+
+.ability-values {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.ability-max {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+}
+
+.ability-control-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.ability-btns {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+
+.ability-mini-btn {
+    background: var(--color-surface);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--color-text-main);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s;
+}
+
+.ability-mini-btn:active:not(:disabled) {
+    transform: scale(0.9);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.ability-mini-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
 }
 
 .sheet-actions {

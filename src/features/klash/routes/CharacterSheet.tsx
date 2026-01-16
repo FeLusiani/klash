@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../../../lib/db';
+import { db, type AbilityValue } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
 import { parseAndRoll, type RollResult } from '../../../lib/dice';
 import { useIsMobile } from '../../../hooks/useIsMobile';
 import { RealisticDiceRoller } from '../components/RealisticDiceRoller';
+import { GAME_CONFIG, type Die } from '../../../config/game';
 import './CharacterSheet.css';
 
 export const CharacterSheet: React.FC = () => {
@@ -33,6 +34,39 @@ export const CharacterSheet: React.FC = () => {
             await db.characters.update(character.id, { currentHp: newHp });
         } catch (error) {
             console.error('Failed to update HP:', error);
+        }
+    };
+
+    const updateAbility = async (code: string, direction: 'up' | 'down') => {
+        if (!character?.id || !character.abilities) return;
+
+        const ability = character.abilities[code] as unknown as AbilityValue;
+        if (!ability) return;
+
+        const currentDie = ability.current as Die;
+        const maxDie = ability.max as Die;
+        const currentIndex = GAME_CONFIG.dice.indexOf(currentDie);
+        const maxIndex = GAME_CONFIG.dice.indexOf(maxDie);
+
+        let newIndex = currentIndex;
+        if (direction === 'up') {
+            newIndex = Math.min(currentIndex + 1, maxIndex);
+        } else {
+            newIndex = Math.max(currentIndex - 1, 0);
+        }
+
+        if (newIndex === currentIndex) return;
+
+        const newDie = GAME_CONFIG.dice[newIndex];
+
+        try {
+            const updatedAbilities = {
+                ...character.abilities,
+                [code]: { ...ability, current: newDie }
+            };
+            await db.characters.update(character.id, { abilities: updatedAbilities });
+        } catch (error) {
+            console.error(`Failed to update ability ${code}:`, error);
         }
     };
 
@@ -67,13 +101,15 @@ export const CharacterSheet: React.FC = () => {
         // This is a bit hacky, but robust enough for now.
         const parsed = parseAndRoll(pendingRoll.die);
 
+        const rawRoll = total - parsed.modifier;
+
         setLastRoll({
             label: pendingRoll.code,
             result: {
                 ...parsed, // sides, modifier, etc.
-                roll: total - parsed.modifier, // Back-calculate raw roll if possible, or just ignore
+                roll: rawRoll,
                 total: total,
-                display: `Rolled ${total} (3D)`
+                display: `Rolled ${rawRoll} on d${parsed.sides}`
             }
         });
 
@@ -167,16 +203,46 @@ export const CharacterSheet: React.FC = () => {
                 </header>
 
                 <section className="abilities-grid">
-                    {Object.entries(character.abilities).map(([code, value]) => (
-                        <button
-                            key={code}
-                            className="ability-card clickable"
-                            onClick={() => handleRoll(code, value)}
-                            aria-label={`Roll ${code} (${value})`}
-                        >
-                            <span className="ability-code">{code}</span>
-                            <span className="ability-value">{String(value)}</span>
-                        </button>
+                    {Object.entries(character.abilities).map(([code, ability]) => (
+                        <div key={code} className="ability-control-container">
+                            <button
+                                className="ability-card clickable"
+                                onClick={() => handleRoll(code, ability.current)}
+                                aria-label={`Roll ${code} (${ability.current})`}
+                            >
+                                <span className="ability-code">{code}</span>
+                                <div className="ability-values">
+                                    <span className="ability-value">{ability.current}</span>
+                                    {ability.current !== ability.max && (
+                                        <span className="ability-max">/ {ability.max}</span>
+                                    )}
+                                </div>
+                            </button>
+                            <div className="ability-btns">
+                                <button
+                                    className="ability-mini-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateAbility(code, 'down');
+                                    }}
+                                    disabled={GAME_CONFIG.dice.indexOf(ability.current as Die) === 0}
+                                    aria-label={`Decrease ${code}`}
+                                >
+                                    -
+                                </button>
+                                <button
+                                    className="ability-mini-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        updateAbility(code, 'up');
+                                    }}
+                                    disabled={GAME_CONFIG.dice.indexOf(ability.current as Die) >= GAME_CONFIG.dice.indexOf(ability.max as Die)}
+                                    aria-label={`Increase ${code}`}
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
                     ))}
                 </section>
 

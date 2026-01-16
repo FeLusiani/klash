@@ -1,9 +1,14 @@
 import Dexie, { type Table } from 'dexie';
 
+export interface AbilityValue {
+    current: string;
+    max: string;
+}
+
 export interface Character {
     id?: number;
     name: string;
-    abilities: Record<string, string>; // e.g. { STR: 'd4', DEX: 'd6' }
+    abilities: Record<string, AbilityValue>;
     maxHp: number;
     currentHp: number;
     hp?: number; // @deprecated
