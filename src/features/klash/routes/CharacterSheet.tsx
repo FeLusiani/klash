@@ -1,6 +1,5 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
