@@ -1,0 +1,41 @@
+body {
+    background-color: var(--color-background);
+    color: var(--color-text-main);
+    font-family: var(--font-sans);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--color-text-main);
+}
+
+h1 {
+    font-size: var(--size-step-4);
+}
+
+h2 {
+    font-size: var(--size-step-3);
+}
+
+h3 {
+    font-size: var(--size-step-2);
+}
+
+a {
+    color: var(--color-brand);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: var(--color-brand-hover);
+}
+
+button {
+    cursor: pointer;
+}

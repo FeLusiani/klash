@@ -1,0 +1,52 @@
+:root {
+  /* Colors - HSL for easy theming */
+  --hue-brand: 250;
+  --color-brand: hsl(var(--hue-brand), 70%, 60%);
+  --color-brand-hover: hsl(var(--hue-brand), 70%, 50%);
+  --color-brand-light: hsl(var(--hue-brand), 70%, 95%);
+
+  --color-text-main: hsl(220, 10%, 15%);
+  --color-text-muted: hsl(220, 10%, 40%);
+  --color-background: hsl(0, 0%, 100%);
+  --color-surface: hsl(220, 10%, 98%);
+  
+  --color-success: hsl(150, 60%, 45%);
+  --color-danger: hsl(0, 70%, 60%);
+  --color-warning: hsl(40, 90%, 60%);
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Fira Code', monospace;
+
+  --size-step-0: 1rem;
+  --size-step-1: 1.25rem;
+  --size-step-2: 1.5rem;
+  --size-step-3: 1.75rem;
+  --size-step-4: 2rem;
+  
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* UI */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+  
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-main: hsl(220, 10%, 90%);
+    --color-text-muted: hsl(220, 10%, 65%);
+    --color-background: hsl(220, 15%, 10%);
+    --color-surface: hsl(220, 15%, 14%);
+  }
+}
