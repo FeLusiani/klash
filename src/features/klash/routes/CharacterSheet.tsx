@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
+import { parseAndRoll, RollResult } from '../../../lib/dice';
 import './CharacterSheet.css';
 
 export const CharacterSheet: React.FC = () => {
@@ -11,6 +12,8 @@ export const CharacterSheet: React.FC = () => {
     const character = useLiveQuery(() =>
         id ? db.characters.get(Number(id)) : undefined
         , [id]);
+
+    const [lastRoll, setLastRoll] = useState<{ label: string; result: RollResult } | null>(null);
 
     // Handle migration/display logic
     const maxHp = character?.maxHp ?? character?.hp ?? 0;
@@ -24,6 +27,11 @@ export const CharacterSheet: React.FC = () => {
         } catch (error) {
             console.error('Failed to update HP:', error);
         }
+    };
+
+    const handleRoll = (code: string, die: string) => {
+        const result = parseAndRoll(die);
+        setLastRoll({ label: code, result });
     };
 
     const handleDelete = async () => {
@@ -52,6 +60,15 @@ export const CharacterSheet: React.FC = () => {
             <div className="sheet-container">
                 <header className="sheet-header">
                     <Link to="/" className="back-link">← Back</Link>
+
+                    {lastRoll && (
+                        <div className="roll-result">
+                            <span className="roll-label">{lastRoll.label} Check</span>
+                            <span className="roll-total">{lastRoll.result.total}</span>
+                            <span className="roll-details">{lastRoll.result.display}</span>
+                        </div>
+                    )}
+
                     <h1>{character.name}</h1>
                     <div className="hp-control">
                         <button
@@ -78,10 +95,15 @@ export const CharacterSheet: React.FC = () => {
 
                 <section className="abilities-grid">
                     {Object.entries(character.abilities).map(([code, value]) => (
-                        <div key={code} className="ability-card">
+                        <button
+                            key={code}
+                            className="ability-card clickable"
+                            onClick={() => handleRoll(code, value)}
+                            aria-label={`Roll ${code} (${value})`}
+                        >
                             <span className="ability-code">{code}</span>
                             <span className="ability-value">{String(value)}</span>
-                        </div>
+                        </button>
                     ))}
                 </section>
 

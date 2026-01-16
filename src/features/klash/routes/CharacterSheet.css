@@ -15,6 +15,52 @@
     text-decoration: underline;
 }
 
+/* Roll Result Display */
+.roll-result {
+    background: var(--color-brand-light);
+    border: 2px solid var(--color-brand);
+    color: var(--color-brand-dark);
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+    animation: slideDown 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.roll-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.roll-total {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.roll-details {
+    font-size: 0.875rem;
+    opacity: 0.8;
+}
+
+/* HP Controls */
 .hp-control {
     display: flex;
     align-items: center;
@@ -78,6 +124,7 @@
     opacity: 0.9;
 }
 
+/* Abilities Grid */
 .abilities-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -91,6 +138,27 @@
     border-radius: var(--radius-lg);
     text-align: center;
     border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+    width: 100%;
+    /* For Button element */
+}
+
+/* Clickable modifiers */
+.ability-card.clickable {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.ability-card.clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-brand);
+}
+
+.ability-card.clickable:active {
+    transform: scale(0.98);
+    background-color: var(--color-background);
 }
 
 .ability-code {
