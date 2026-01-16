@@ -30,18 +30,11 @@ export const parseAndRoll = (dieStr: string): RollResult => {
     const roll = Math.floor(Math.random() * sides) + 1;
     const total = roll + modifier;
 
-    // Format display string
-    // If there's a modifier: "Total (Roll [+/-] Mod)"
-    // If plain: "Total (dx)"
-    const modDisplay = modifier !== 0
-        ? `${modifier > 0 ? '+' : ''}${modifier}`
-        : '';
-
     return {
         total,
         roll,
         sides,
         modifier,
-        display: `${total} (rolled ${roll}${modDisplay})`
+        display: `Rolled ${roll} on d${sides}`
     };
 };

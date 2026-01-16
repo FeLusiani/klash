@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
 import { parseAndRoll, type RollResult } from '../../../lib/dice';
+import { useIsMobile } from '../../../hooks/useIsMobile';
 import './CharacterSheet.css';
 
 export const CharacterSheet: React.FC = () => {
@@ -14,6 +15,9 @@ export const CharacterSheet: React.FC = () => {
         , [id]);
 
     const [lastRoll, setLastRoll] = useState<{ label: string; result: RollResult } | null>(null);
+    const [realisticRoll, setRealisticRoll] = useState(false);
+    const [isRolling, setIsRolling] = useState(false);
+    const isMobile = useIsMobile();
 
     // Handle migration/display logic
     const maxHp = character?.maxHp ?? character?.hp ?? 0;
@@ -30,8 +34,18 @@ export const CharacterSheet: React.FC = () => {
     };
 
     const handleRoll = (code: string, die: string) => {
-        const result = parseAndRoll(die);
-        setLastRoll({ label: code, result });
+        if (isMobile && realisticRoll) {
+            setIsRolling(true);
+            setLastRoll(null);
+            setTimeout(() => {
+                const result = parseAndRoll(die);
+                setLastRoll({ label: code, result });
+                setIsRolling(false);
+            }, 2000);
+        } else {
+            const result = parseAndRoll(die);
+            setLastRoll({ label: code, result });
+        }
     };
 
     const handleDelete = async () => {
@@ -59,10 +73,33 @@ export const CharacterSheet: React.FC = () => {
         <Layout>
             <div className="sheet-container">
                 <header className="sheet-header">
-                    <Link to="/" className="back-link">← Back</Link>
+                    <div className="header-top-row">
+                        <Link to="/" className="back-link">← Back</Link>
+
+                        {isMobile && (
+                            <div className="realistic-roll-toggle">
+                                <span className="toggle-label">Realistic Dice</span>
+                                <label className="switch">
+                                    <input
+                                        type="checkbox"
+                                        checked={realisticRoll}
+                                        onChange={(e) => setRealisticRoll(e.target.checked)}
+                                    />
+                                    <span className="slider round"></span>
+                                </label>
+                            </div>
+                        )}
+                    </div>
 
                     {lastRoll && (
                         <div className="roll-result">
+                            <button
+                                className="roll-close-btn"
+                                onClick={() => setLastRoll(null)}
+                                aria-label="Close result"
+                            >
+                                ✕
+                            </button>
                             <span className="roll-label">{lastRoll.label} Check</span>
                             <span className="roll-total">{lastRoll.result.total}</span>
                             <span className="roll-details">{lastRoll.result.display}</span>
@@ -70,6 +107,13 @@ export const CharacterSheet: React.FC = () => {
                     )}
 
                     <h1>{character.name}</h1>
+
+                    {isRolling && (
+                        <div className="rolling-indicator">
+                            Rolling...
+                        </div>
+                    )}
+
                     <div className="hp-control">
                         <button
                             className="hp-btn"
