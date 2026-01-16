@@ -4,8 +4,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type AbilityValue } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
 import { parseAndRoll, type RollResult } from '../../../lib/dice';
-import { useIsMobile } from '../../../hooks/useIsMobile';
-import { RealisticDiceRoller } from '../components/RealisticDiceRoller';
+// import { useIsMobile } from '../../../hooks/useIsMobile';
+// import { RealisticDiceRoller } from '../components/RealisticDiceRoller';
 import { GAME_CONFIG, type Die } from '../../../config/game';
 import './CharacterSheet.css';
 
@@ -17,11 +17,11 @@ export const CharacterSheet: React.FC = () => {
         , [id]);
 
     const [lastRoll, setLastRoll] = useState<{ label: string; result: RollResult } | null>(null);
-    const [realisticRoll, setRealisticRoll] = useState(false);
+    // realisticRoll state removed
     // isRolling removed
-    const [showDiceOverlay, setShowDiceOverlay] = useState(false);
-    const [pendingRoll, setPendingRoll] = useState<{ code: string; die: string } | null>(null);
-    const isMobile = useIsMobile();
+    // const [showDiceOverlay, setShowDiceOverlay] = useState(false);
+    // const [pendingRoll, setPendingRoll] = useState<{ code: string; die: string } | null>(null);
+    // const isMobile = useIsMobile();
 
     // Handle migration/display logic
     const maxHp = character?.maxHp ?? character?.hp ?? 0;
@@ -71,42 +71,20 @@ export const CharacterSheet: React.FC = () => {
     };
 
     const handleRoll = (code: string, die: string) => {
-        if (isMobile && realisticRoll) {
-            setPendingRoll({ code, die });
-            setShowDiceOverlay(true);
-        } else {
-            const result = parseAndRoll(die);
-            setLastRoll({ label: code, result });
-        }
+        const result = parseAndRoll(die);
+        setLastRoll({ label: code, result });
     };
 
-    const handleRealisticRollComplete = (total: number, _results: any) => { // results unused for now but available
+    /* 
+    const handleRealisticRollComplete = (total: number, _results: any) => {
         if (!pendingRoll) return;
-
-        // Construct a RollResult. 
-        // Note: dice-box result structure might be different, but we mostly care about the total here.
-        // We might want to parse the modifiers from the original die string to add them to the physical roll if needed.
-        // However, dice-box handles complex rolls if we pass the string "d20+2".
-        // Let's assume we pass the full string to dice-box.
-
-        // Wait, parseAndRoll does the math logic. dice-box does physics.
-        // If we pass "d20+5" to dice-box, it might roll d20 and adding 5.
-        // Let's trust dice-box return or reconstruct it.
-        // Actually, for consistency with our `RollResult` type, we might want to use `parseAndRoll`'s parsing logic 
-        // but replace the random part of the roll with what dice-box gave us.
-        // BUT, dice-box handles multiple dice. 
-        // Let's simplify: We use the total from dice-box.
-
-        // Re-parsing to get sides and modifier for display
-        // This is a bit hacky, but robust enough for now.
         const parsed = parseAndRoll(pendingRoll.die);
-
         const rawRoll = total - parsed.modifier;
 
         setLastRoll({
             label: pendingRoll.code,
             result: {
-                ...parsed, // sides, modifier, etc.
+                ...parsed,
                 roll: rawRoll,
                 total: total,
                 display: `Rolled ${rawRoll} on d${parsed.sides}`
@@ -116,6 +94,7 @@ export const CharacterSheet: React.FC = () => {
         setShowDiceOverlay(false);
         setPendingRoll(null);
     };
+    */
 
     const handleDelete = async () => {
         if (!character?.id) return;
@@ -144,20 +123,6 @@ export const CharacterSheet: React.FC = () => {
                 <header className="sheet-header">
                     <div className="header-top-row">
                         <Link to="/" className="back-link">← Back</Link>
-
-                        {isMobile && (
-                            <div className="realistic-roll-toggle">
-                                <span className="toggle-label">Realistic Dice</span>
-                                <label className="switch">
-                                    <input
-                                        type="checkbox"
-                                        checked={realisticRoll}
-                                        onChange={(e) => setRealisticRoll(e.target.checked)}
-                                    />
-                                    <span className="slider round"></span>
-                                </label>
-                            </div>
-                        )}
                     </div>
 
                     {lastRoll && (
@@ -256,6 +221,7 @@ export const CharacterSheet: React.FC = () => {
                 </footer>
             </div>
 
+            {/* 
             {showDiceOverlay && pendingRoll && (
                 <RealisticDiceRoller
                     dieType={pendingRoll.die}
@@ -263,6 +229,7 @@ export const CharacterSheet: React.FC = () => {
                     onClose={() => setShowDiceOverlay(false)}
                 />
             )}
+            */}
         </Layout>
     );
 };
