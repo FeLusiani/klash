@@ -24,7 +24,8 @@ export const CreateCharacter: React.FC = () => {
             const id = await db.characters.add({
                 name,
                 abilities,
-                hp,
+                maxHp: hp,
+                currentHp: hp,
                 createdAt: Date.now()
             });
             navigate(`/characters/${id}`);
