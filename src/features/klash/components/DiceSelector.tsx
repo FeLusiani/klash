@@ -6,14 +6,16 @@ interface DiceSelectorProps {
     value: string;
     onChange: (value: Die) => void;
     label: string;
+    options?: Die[];
 }
 
-export const DiceSelector: React.FC<DiceSelectorProps> = ({ value, onChange, label }) => {
+export const DiceSelector: React.FC<DiceSelectorProps> = ({ value, onChange, label, options }) => {
+    const diceOptions = options || GAME_CONFIG.creationDice;
     return (
         <div className="dice-selector">
             <label className="dice-label">{label}</label>
             <div className="dice-options">
-                {GAME_CONFIG.creationDice.map((die) => (
+                {diceOptions.map((die) => (
                     <button
                         key={die}
                         type="button"

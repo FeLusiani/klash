@@ -9,6 +9,22 @@ import { parseAndRoll, type RollResult } from '../../../lib/dice';
 import { GAME_CONFIG, type Die } from '../../../config/game';
 import './CharacterSheet.css';
 
+import d4Icon from '../../../assets/noun-d4.svg';
+import d6Icon from '../../../assets/noun-d6.svg';
+import d8Icon from '../../../assets/noun-d8.svg';
+import d10Icon from '../../../assets/noun-d10.svg';
+import d12Icon from '../../../assets/noun-d12.svg';
+import d20Icon from '../../../assets/noun-d20.svg';
+
+const diceIcons: Record<string, string> = {
+    'd4': d4Icon,
+    'd6': d6Icon,
+    'd8': d8Icon,
+    'd10': d10Icon,
+    'd12': d12Icon,
+    'd20': d20Icon,
+};
+
 export const CharacterSheet: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -17,6 +33,7 @@ export const CharacterSheet: React.FC = () => {
         , [id]);
 
     const [lastRoll, setLastRoll] = useState<{ label: string; result: RollResult } | null>(null);
+    const [lastDiceRolled, setLastDiceRolled] = useState<string | null>(null);
     // realisticRoll state removed
     // isRolling removed
     // const [showDiceOverlay, setShowDiceOverlay] = useState(false);
@@ -73,6 +90,8 @@ export const CharacterSheet: React.FC = () => {
     const handleRoll = (code: string, die: string) => {
         const result = parseAndRoll(die);
         setLastRoll({ label: code, result });
+        const baseDie = die.match(/d\d+/)?.[0] || null;
+        setLastDiceRolled(baseDie);
     };
 
     /* 
@@ -123,20 +142,37 @@ export const CharacterSheet: React.FC = () => {
                 <header className="sheet-header">
                     <div className="header-top-row">
                         <Link to="/" className="back-link">← Back</Link>
+                        <Link to={`/characters/${id}/edit`} className="edit-link">Edit</Link>
                     </div>
 
                     {lastRoll && (
                         <div className="roll-result">
                             <button
                                 className="roll-close-btn"
-                                onClick={() => setLastRoll(null)}
+                                onClick={() => {
+                                    setLastRoll(null);
+                                    setLastDiceRolled(null);
+                                }}
                                 aria-label="Close result"
                             >
                                 ✕
                             </button>
-                            <span className="roll-label">{lastRoll.label} Check</span>
-                            <span className="roll-total">{lastRoll.result.total}</span>
-                            <span className="roll-details">{lastRoll.result.display}</span>
+                            <div className="roll-result-container">
+                                {lastDiceRolled && diceIcons[lastDiceRolled] && (
+                                    <div className="roll-icon-side">
+                                        <img
+                                            src={diceIcons[lastDiceRolled]}
+                                            alt={lastDiceRolled}
+                                            className="dice-icon-result"
+                                        />
+                                    </div>
+                                )}
+                                <div className="roll-info-side">
+                                    <span className="roll-label">{lastRoll.label} Check</span>
+                                    <span className="roll-total">{lastRoll.result.total}</span>
+                                    <span className="roll-details">{lastRoll.result.display}</span>
+                                </div>
+                            </div>
                         </div>
                     )}
 

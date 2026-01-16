@@ -16,15 +16,18 @@
     text-decoration: none;
 }
 
-
-/* Toggle Switch */
-.realistic-roll-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.back-link:hover {
+    text-decoration: underline;
 }
 
-.back-link:hover {
+.edit-link {
+    color: var(--color-brand);
+    font-size: 0.875rem;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.edit-link:hover {
     text-decoration: underline;
 }
 
@@ -37,11 +40,39 @@
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-lg);
     animation: slideDown 0.3s ease-out;
+    position: relative;
+    min-height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.roll-result-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-lg);
+    width: 100%;
+}
+
+.roll-icon-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dice-icon-result {
+    width: 110px;
+    height: 110px;
+    opacity: 1;
+    filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.roll-info-side {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-xs);
-    position: relative;
 }
 
 .roll-close-btn {

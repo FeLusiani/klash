@@ -30,11 +30,12 @@ export const parseAndRoll = (dieStr: string): RollResult => {
     const roll = Math.floor(Math.random() * sides) + 1;
     const total = roll + modifier;
 
+    const displayModifier = modifier !== 0 ? `${operator}${modVal}` : '';
     return {
         total,
         roll,
         sides,
         modifier,
-        display: `Rolled ${roll} on d${sides}`
+        display: `Rolled ${roll} on d${sides}${displayModifier}`
     };
 };
