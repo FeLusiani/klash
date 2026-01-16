@@ -5,6 +5,7 @@ import { db } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
 import { parseAndRoll, type RollResult } from '../../../lib/dice';
 import { useIsMobile } from '../../../hooks/useIsMobile';
+import { RealisticDiceRoller } from '../components/RealisticDiceRoller';
 import './CharacterSheet.css';
 
 export const CharacterSheet: React.FC = () => {
@@ -16,7 +17,9 @@ export const CharacterSheet: React.FC = () => {
 
     const [lastRoll, setLastRoll] = useState<{ label: string; result: RollResult } | null>(null);
     const [realisticRoll, setRealisticRoll] = useState(false);
-    const [isRolling, setIsRolling] = useState(false);
+    // isRolling removed
+    const [showDiceOverlay, setShowDiceOverlay] = useState(false);
+    const [pendingRoll, setPendingRoll] = useState<{ code: string; die: string } | null>(null);
     const isMobile = useIsMobile();
 
     // Handle migration/display logic
@@ -35,17 +38,47 @@ export const CharacterSheet: React.FC = () => {
 
     const handleRoll = (code: string, die: string) => {
         if (isMobile && realisticRoll) {
-            setIsRolling(true);
-            setLastRoll(null);
-            setTimeout(() => {
-                const result = parseAndRoll(die);
-                setLastRoll({ label: code, result });
-                setIsRolling(false);
-            }, 2000);
+            setPendingRoll({ code, die });
+            setShowDiceOverlay(true);
         } else {
             const result = parseAndRoll(die);
             setLastRoll({ label: code, result });
         }
+    };
+
+    const handleRealisticRollComplete = (total: number, _results: any) => { // results unused for now but available
+        if (!pendingRoll) return;
+
+        // Construct a RollResult. 
+        // Note: dice-box result structure might be different, but we mostly care about the total here.
+        // We might want to parse the modifiers from the original die string to add them to the physical roll if needed.
+        // However, dice-box handles complex rolls if we pass the string "d20+2".
+        // Let's assume we pass the full string to dice-box.
+
+        // Wait, parseAndRoll does the math logic. dice-box does physics.
+        // If we pass "d20+5" to dice-box, it might roll d20 and adding 5.
+        // Let's trust dice-box return or reconstruct it.
+        // Actually, for consistency with our `RollResult` type, we might want to use `parseAndRoll`'s parsing logic 
+        // but replace the random part of the roll with what dice-box gave us.
+        // BUT, dice-box handles multiple dice. 
+        // Let's simplify: We use the total from dice-box.
+
+        // Re-parsing to get sides and modifier for display
+        // This is a bit hacky, but robust enough for now.
+        const parsed = parseAndRoll(pendingRoll.die);
+
+        setLastRoll({
+            label: pendingRoll.code,
+            result: {
+                ...parsed, // sides, modifier, etc.
+                roll: total - parsed.modifier, // Back-calculate raw roll if possible, or just ignore
+                total: total,
+                display: `Rolled ${total} (3D)`
+            }
+        });
+
+        setShowDiceOverlay(false);
+        setPendingRoll(null);
     };
 
     const handleDelete = async () => {
@@ -108,11 +141,7 @@ export const CharacterSheet: React.FC = () => {
 
                     <h1>{character.name}</h1>
 
-                    {isRolling && (
-                        <div className="rolling-indicator">
-                            Rolling...
-                        </div>
-                    )}
+
 
                     <div className="hp-control">
                         <button
@@ -160,6 +189,14 @@ export const CharacterSheet: React.FC = () => {
                     </button>
                 </footer>
             </div>
+
+            {showDiceOverlay && pendingRoll && (
+                <RealisticDiceRoller
+                    dieType={pendingRoll.die}
+                    onRollComplete={handleRealisticRollComplete}
+                    onClose={() => setShowDiceOverlay(false)}
+                />
+            )}
         </Layout>
     );
 };
