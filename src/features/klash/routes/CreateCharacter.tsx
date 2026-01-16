@@ -10,7 +10,16 @@ export const CreateCharacter: React.FC = () => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const errorRef = React.useRef<HTMLDivElement>(null);
     const [hp, setHp] = useState(4);
+
+    // Focus error message when it appears
+    React.useEffect(() => {
+        if (error && errorRef.current) {
+            errorRef.current.focus();
+        }
+    }, [error]);
+
     const [abilities, setAbilities] = useState<Record<string, Die>>({
         STR: 'd6',
         DEX: 'd6',
@@ -57,7 +66,16 @@ export const CreateCharacter: React.FC = () => {
             <div className="create-container">
                 <h1>New Character</h1>
                 <form onSubmit={handleSubmit}>
-                    {error && <div className="error-message">{error}</div>}
+                    {error && (
+                        <div
+                            className="error-message"
+                            ref={errorRef}
+                            tabIndex={-1}
+                            role="alert"
+                        >
+                            {error}
+                        </div>
+                    )}
                     <div className="form-group">
                         <label htmlFor="name">Character Name</label>
                         <input
