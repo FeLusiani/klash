@@ -354,7 +354,7 @@ export const CharacterSheet: React.FC = () => {
 
                         <section className="magic-dice-section">
                             <h2>
-                                Magic Dice available per casting: <span className="magic-dice-value">{magicDiceCount}</span>
+                                Magic Dice for casting: <span className="magic-dice-value">{magicDiceCount}</span>
                             </h2>
                         </section>
 
