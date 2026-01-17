@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['new_daggers.svg', 'favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'My Offline PWA',
-        short_name: 'PWA',
+        name: 'Klash',
+        short_name: 'Klash',
         description: 'An offline-first Progressive Web App',
         theme_color: '#ffffff',
         display: 'standalone',

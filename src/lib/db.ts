@@ -21,7 +21,7 @@ export class AppDatabase extends Dexie {
     characters!: Table<Character>;
 
     constructor() {
-        super('KlashOfflinePWA');
+        super('KlashOffline');
 
         // Define schema
         this.version(1).stores({

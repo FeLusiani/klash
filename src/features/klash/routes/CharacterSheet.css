@@ -139,9 +139,15 @@
 .hp-control,
 .wounds-control {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-md);
+    gap: var(--space-xs);
+}
+
+.stat-btns {
+    display: flex;
+    gap: var(--space-sm);
 }
 
 .stat-btn {
@@ -210,8 +216,9 @@
 /* Abilities Grid */
 .abilities-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: var(--space-md);
+    /* Use clamp for more elastic resizing */
+    grid-template-columns: repeat(auto-fit, minmax(clamp(80px, 20vw, 120px), 1fr));
+    gap: var(--space-sm);
     margin-bottom: var(--space-2xl);
 }
 

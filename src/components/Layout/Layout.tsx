@@ -11,7 +11,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="layout">
             <header className="layout-header">
                 <div className="layout-brand">
-                    <Link to="/">PWA</Link>
+                    <Link to="/">Klash</Link>
                 </div>
                 <nav className="layout-nav">
                     <Link to="/todos">Todos</Link>

@@ -27,7 +27,7 @@ export const Home: React.FC = () => {
                     {characters?.length === 0 ? (
                         <div className="empty-state">
                             <p>No characters created yet.</p>
-                            <p>Press the button to create your first Klash character!</p>
+                            <p>Press the button to create a new character.</p>
                         </div>
                     ) : (
                         <div className="grid">
