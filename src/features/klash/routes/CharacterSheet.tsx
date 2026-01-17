@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSwipeable } from 'react-swipeable';
 import { db, type AbilityValue, type InventoryItem } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
 import { parseAndRoll, type RollResult } from '../../../lib/dice';
@@ -48,6 +49,19 @@ export const CharacterSheet: React.FC = () => {
     const [lastRoll, setLastRoll] = useState<{ label: string; result: RollResult } | null>(null);
     const [lastDiceRolled, setLastDiceRolled] = useState<string | null>(null);
     const [direction, setDirection] = useState<number>(1); // 1 for next, -1 for prev
+
+    // Swipeable handlers for touch navigation
+    const swipeHandlers = useSwipeable({
+        onSwipedLeft: () => {
+            if (nextId) navigateTo(nextId, 1);
+        },
+        onSwipedRight: () => {
+            if (prevId) navigateTo(prevId, -1);
+        },
+        trackMouse: false, // Only track touch, not mouse drag
+        preventScrollOnSwipe: true,
+        delta: 50, // Minimum swipe distance (pixels)
+    });
     // realisticRoll state removed
     // isRolling removed
     // const [showDiceOverlay, setShowDiceOverlay] = useState(false);
@@ -236,19 +250,9 @@ export const CharacterSheet: React.FC = () => {
                         initial="enter"
                         animate="center"
                         exit="exit"
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                        drag="x"
-                        dragConstraints={{ left: 0, right: 0 }}
-                        dragElastic={0.5}
-                        onDragEnd={(_e, info) => {
-                            const threshold = 100;
-                            if (info.offset.x < -threshold && nextId) {
-                                navigateTo(nextId, 1);
-                            } else if (info.offset.x > threshold && prevId) {
-                                navigateTo(prevId, -1);
-                            }
-                        }}
+                        transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
                         className="sheet-container"
+                        {...swipeHandlers}
                     >
                         <header className="sheet-header">
                             <div className="header-top-row">
