@@ -5,6 +5,11 @@ export interface AbilityValue {
     max: string;
 }
 
+export interface InventoryItem {
+    name: string;
+    quality: number;
+}
+
 export interface Character {
     id?: number;
     name: string;
@@ -13,7 +18,7 @@ export interface Character {
     currentHp: number;
     currentWounds: number;
     hp?: number; // @deprecated
-    inventory?: string[];
+    inventory?: (string | InventoryItem)[];
     createdAt: number;
 }
 

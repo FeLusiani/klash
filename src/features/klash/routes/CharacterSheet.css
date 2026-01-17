@@ -641,3 +641,44 @@ input:checked+.slider:before {
         display: none;
     }
 }
+
+/* Inventory Quality Dots */
+.inventory-quality-tile {
+    background: var(--color-surface);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-sm);
+    padding: 0 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    min-width: 44px;
+    transition: all 0.2s;
+}
+
+.inventory-quality-tile:hover {
+    border-color: var(--color-brand);
+}
+
+.quality-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.quality-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-brand);
+    transition: background-color 0.2s;
+}
+
+.quality-dot.filled {
+    background: var(--color-brand);
+}
+
+.quality-dot.empty {
+    background: transparent;
+    opacity: 0.3;
+}

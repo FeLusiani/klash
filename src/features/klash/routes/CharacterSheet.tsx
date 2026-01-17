@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence } from 'framer-motion';
-import { db, type AbilityValue } from '../../../lib/db';
+import { db, type AbilityValue, type InventoryItem } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
 import { parseAndRoll, type RollResult } from '../../../lib/dice';
 // import { useIsMobile } from '../../../hooks/useIsMobile';
@@ -369,7 +369,7 @@ export const CharacterSheet: React.FC = () => {
                                         const currentInventory = character.inventory || [];
                                         if (currentInventory.length >= 10) return;
                                         await db.characters.update(character.id, {
-                                            inventory: [...currentInventory, '']
+                                            inventory: [...currentInventory, { name: '', quality: 3 }]
                                         });
                                     }}
                                     disabled={(character.inventory || []).length >= 10}
@@ -379,37 +379,66 @@ export const CharacterSheet: React.FC = () => {
                                 </button>
                             </div>
                             <div className="inventory-list">
-                                {(character.inventory || []).map((item, index) => (
-                                    <div key={index} className="inventory-item">
-                                        <input
-                                            type="text"
-                                            className="inventory-input"
-                                            value={item}
-                                            onChange={async (e) => {
-                                                if (!character?.id) return;
-                                                const newInventory = [...(character.inventory || [])];
-                                                newInventory[index] = e.target.value;
-                                                await db.characters.update(character.id, {
-                                                    inventory: newInventory
-                                                });
-                                            }}
-                                            placeholder="New item..."
-                                        />
-                                        <button
-                                            className="inventory-delete-btn"
-                                            onClick={async () => {
-                                                if (!character?.id) return;
-                                                const newInventory = (character.inventory || []).filter((_, i) => i !== index);
-                                                await db.characters.update(character.id, {
-                                                    inventory: newInventory
-                                                });
-                                            }}
-                                            aria-label="Delete item"
-                                        >
-                                            ✕
-                                        </button>
-                                    </div>
-                                ))}
+                                {(character.inventory || []).map((itemOrString, index) => {
+                                    const item: InventoryItem = typeof itemOrString === 'string'
+                                        ? { name: itemOrString, quality: 3 }
+                                        : itemOrString;
+
+                                    return (
+                                        <div key={index} className="inventory-item">
+                                            <button
+                                                className="inventory-quality-tile"
+                                                onClick={async () => {
+                                                    if (!character?.id) return;
+                                                    const newInventory = [...(character.inventory || [])];
+                                                    const currentQuality = item.quality;
+                                                    const newQuality = currentQuality === 0 ? 3 : currentQuality - 1;
+                                                    newInventory[index] = { ...item, quality: newQuality };
+                                                    await db.characters.update(character.id, {
+                                                        inventory: newInventory
+                                                    });
+                                                }}
+                                                title={`Quality: ${item.quality}/3`}
+                                            >
+                                                <div className="quality-dots">
+                                                    {[...Array(3)].map((_, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className={`quality-dot ${i < item.quality ? 'filled' : 'empty'}`}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </button>
+                                            <input
+                                                type="text"
+                                                className="inventory-input"
+                                                value={item.name}
+                                                onChange={async (e) => {
+                                                    if (!character?.id) return;
+                                                    const newInventory = [...(character.inventory || [])];
+                                                    newInventory[index] = { ...item, name: e.target.value };
+                                                    await db.characters.update(character.id, {
+                                                        inventory: newInventory
+                                                    });
+                                                }}
+                                                placeholder="New item..."
+                                            />
+                                            <button
+                                                className="inventory-delete-btn"
+                                                onClick={async () => {
+                                                    if (!character?.id) return;
+                                                    const newInventory = (character.inventory || []).filter((_, i) => i !== index);
+                                                    await db.characters.update(character.id, {
+                                                        inventory: newInventory
+                                                    });
+                                                }}
+                                                aria-label="Delete item"
+                                            >
+                                                ✕
+                                            </button>
+                                        </div>
+                                    );
+                                })}
                                 {(character.inventory || []).length === 0 && (
                                     <p className="empty-message">No items in inventory</p>
                                 )}
