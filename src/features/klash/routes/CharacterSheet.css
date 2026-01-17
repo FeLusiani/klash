@@ -566,37 +566,65 @@ input:checked+.slider:before {
 .sheet-viewport {
     position: relative;
     width: 100%;
-    overflow-x: hidden;
-    padding: 0 var(--space-md);
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--space-md) 0;
+    /* Removed overflow-x: hidden to allow arrows to peek and see card swipe */
 }
 
 .sheet-container {
     position: relative;
     width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
     touch-action: pan-y;
+    background: var(--color-background);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-lg);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.pagination-dots {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
+.pagination-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-text-muted);
+    opacity: 0.3;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pagination-dot.active {
+    background: var(--color-brand);
+    opacity: 1;
+    transform: scale(1.2);
 }
 
 .nav-arrow {
-    position: fixed;
+    position: absolute;
     top: 50%;
     transform: translateY(-50%);
     background: var(--color-surface);
     color: var(--color-brand);
     border: 1px solid rgba(0, 0, 0, 0.1);
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--radius-full);
-    font-size: 2rem;
+    font-size: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: var(--shadow-md);
     transition: all 0.2s;
-    z-index: 100;
-    opacity: 0.8;
+    z-index: 10;
+    opacity: 0.6;
 }
 
 .nav-arrow:hover {
@@ -611,11 +639,11 @@ input:checked+.slider:before {
 }
 
 .nav-prev {
-    left: var(--space-lg);
+    left: -20px;
 }
 
 .nav-next {
-    right: var(--space-lg);
+    right: -20px;
 }
 
 @media (max-width: 480px) {
@@ -636,9 +664,41 @@ input:checked+.slider:before {
 }
 
 /* Responsive Navigation */
-@media (max-width: 900px) {
+@media (max-width: 700px) {
+    .sheet-viewport {
+        padding: var(--space-md) var(--space-md);
+    }
+
+    .nav-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 1.25rem;
+        opacity: 0.8;
+    }
+
+    .nav-prev {
+        left: 10px;
+    }
+
+    .nav-next {
+        right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
     .nav-arrow {
         display: none;
+    }
+
+    .sheet-viewport {
+        padding: var(--space-sm);
+    }
+
+    .sheet-container {
+        padding: var(--space-md);
+        box-shadow: none;
+        border: none;
+        background: transparent;
     }
 }
 

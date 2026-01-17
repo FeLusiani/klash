@@ -35,18 +35,19 @@ export const CharacterSheet: React.FC = () => {
 
     const allCharacters = useLiveQuery(() => db.characters.toArray());
 
-    const { prevId, nextId } = useMemo(() => {
-        if (!allCharacters || !id) return { prevId: null, nextId: null };
-        const currentIndex = allCharacters.findIndex(c => c.id === Number(id));
-        if (currentIndex === -1) return { prevId: null, nextId: null };
+    const { prevId, nextId, currentIndex, totalCount } = useMemo(() => {
+        if (!allCharacters || !id) return { prevId: null, nextId: null, currentIndex: -1, totalCount: 0 };
+        const index = allCharacters.findIndex(c => c.id === Number(id));
+        if (index === -1) return { prevId: null, nextId: null, currentIndex: -1, totalCount: allCharacters?.length || 0 };
 
-        const prev = allCharacters[currentIndex - 1]?.id || null;
-        const next = allCharacters[currentIndex + 1]?.id || null;
-        return { prevId: prev, nextId: next };
+        const prev = allCharacters[index - 1]?.id || null;
+        const next = allCharacters[index + 1]?.id || null;
+        return { prevId: prev, nextId: next, currentIndex: index, totalCount: allCharacters.length };
     }, [allCharacters, id]);
 
     const [lastRoll, setLastRoll] = useState<{ label: string; result: RollResult } | null>(null);
     const [lastDiceRolled, setLastDiceRolled] = useState<string | null>(null);
+    const [direction, setDirection] = useState<number>(1); // 1 for next, -1 for prev
     // realisticRoll state removed
     // isRolling removed
     // const [showDiceOverlay, setShowDiceOverlay] = useState(false);
@@ -171,21 +172,70 @@ export const CharacterSheet: React.FC = () => {
         );
     }
 
-    const navigateTo = (charId: number | null) => {
+    const navigateTo = (charId: number | null, dir: number = 1) => {
         if (charId) {
+            setDirection(dir);
             navigate(`/characters/${charId}`);
         }
+    };
+
+    // Framer Motion variants for directional transitions
+    const variants = {
+        enter: (direction: number) => ({
+            x: direction > 0 ? 300 : -300,
+            opacity: 0
+        }),
+        center: {
+            x: 0,
+            opacity: 1
+        },
+        exit: (direction: number) => ({
+            x: direction > 0 ? -300 : 300,
+            opacity: 0
+        })
     };
 
     return (
         <Layout>
             <div className="sheet-viewport">
-                <AnimatePresence mode="wait">
+                {prevId && (
+                    <button
+                        className="nav-arrow nav-prev"
+                        onClick={() => navigateTo(prevId, -1)}
+                        aria-label="Previous character"
+                    >
+                        ‹
+                    </button>
+                )}
+                {nextId && (
+                    <button
+                        className="nav-arrow nav-next"
+                        onClick={() => navigateTo(nextId, 1)}
+                        aria-label="Next character"
+                    >
+                        ›
+                    </button>
+                )}
+                <div className="pagination-dots">
+                    {Array.from({ length: totalCount }).map((_, i) => (
+                        <div
+                            key={i}
+                            className={`pagination-dot ${i === currentIndex ? 'active' : ''}`}
+                            onClick={() => {
+                                const dir = i > currentIndex ? 1 : -1;
+                                navigateTo(allCharacters?.[i].id || null, dir);
+                            }}
+                        />
+                    ))}
+                </div>
+                <AnimatePresence mode="wait" initial={false} custom={direction}>
                     <motion.div
                         key={id}
-                        initial={{ x: 300, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -300, opacity: 0 }}
+                        custom={direction}
+                        variants={variants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
                         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                         drag="x"
                         dragConstraints={{ left: 0, right: 0 }}
@@ -193,31 +243,13 @@ export const CharacterSheet: React.FC = () => {
                         onDragEnd={(_e, info) => {
                             const threshold = 100;
                             if (info.offset.x < -threshold && nextId) {
-                                navigateTo(nextId);
+                                navigateTo(nextId, 1);
                             } else if (info.offset.x > threshold && prevId) {
-                                navigateTo(prevId);
+                                navigateTo(prevId, -1);
                             }
                         }}
                         className="sheet-container"
                     >
-                        {prevId && (
-                            <button
-                                className="nav-arrow nav-prev"
-                                onClick={() => navigateTo(prevId)}
-                                aria-label="Previous character"
-                            >
-                                ‹
-                            </button>
-                        )}
-                        {nextId && (
-                            <button
-                                className="nav-arrow nav-next"
-                                onClick={() => navigateTo(nextId)}
-                                aria-label="Next character"
-                            >
-                                ›
-                            </button>
-                        )}
                         <header className="sheet-header">
                             <div className="header-top-row">
                                 <Link to="/" className="back-link">← Back</Link>
