@@ -50,6 +50,12 @@ export const CharacterSheet: React.FC = () => {
     const maxWounds = maxWoundsMatch ? parseInt(maxWoundsMatch[1], 10) : 6;
     const currentWounds = character?.currentWounds ?? 0;
 
+    // Calculate Magic Dice based on WIL
+    const wilDie = character?.abilities?.WIL?.current || 'd4';
+    const wilSidesMatch = wilDie.match(/d(\d+)/);
+    const wilSides = wilSidesMatch ? parseInt(wilSidesMatch[1], 10) : 4;
+    const magicDiceCount = Math.max(0, Math.floor((wilSides - 4) / 2));
+
     const updateHp = async (newHp: number) => {
         if (!character?.id) return;
         try {
@@ -286,6 +292,13 @@ export const CharacterSheet: React.FC = () => {
                         </div>
                     ))}
                 </section>
+
+                <section className="magic-dice-section">
+                    <h2>
+                        Magic Dice available per casting: <span className="magic-dice-value">{magicDiceCount}</span>
+                    </h2>
+                </section>
+
 
                 <section className="inventory-section">
                     <div className="inventory-header">

@@ -35,17 +35,21 @@ export const Home: React.FC = () => {
                                 <Link key={char.id} to={`/characters/${char.id}`} className="character-card">
                                     <h2>{char.name}</h2>
                                     <div className="stats-preview">
-                                        <div className="hp-preview">
-                                            HP: {char.currentHp ?? char.hp ?? 0}/{char.maxHp ?? char.hp ?? 0}
+                                        <div className="stats-main">
+                                            <div className="hp-preview">
+                                                HP: {char.currentHp ?? char.hp ?? 0}/{char.maxHp ?? char.hp ?? 0}
+                                            </div>
+                                            <div className="wounds-preview">
+                                                W: {char.currentWounds ?? 0}/{(char.abilities.STR.max.match(/d(\d+)/)?.[1] || 6)}
+                                            </div>
                                         </div>
-                                        <div className="wounds-preview">
-                                            W: {char.currentWounds ?? 0}/{(char.abilities.STR.max.match(/d(\d+)/)?.[1] || 6)}
+                                        <div className="stats-abilities">
+                                            {Object.entries(char.abilities).map(([code, ability]) => (
+                                                <span key={code} className="stat-badge">
+                                                    {code}: {ability.max}
+                                                </span>
+                                            ))}
                                         </div>
-                                        {Object.entries(char.abilities).map(([code, ability]) => (
-                                            <span key={code} className="stat-badge">
-                                                {code}: {ability.max}
-                                            </span>
-                                        ))}
                                     </div>
                                 </Link>
                             ))}

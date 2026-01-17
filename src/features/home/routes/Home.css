@@ -57,6 +57,13 @@
 
 .stats-preview {
     display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.stats-main,
+.stats-abilities {
+    display: flex;
     gap: var(--space-xs);
     flex-wrap: wrap;
     align-items: center;

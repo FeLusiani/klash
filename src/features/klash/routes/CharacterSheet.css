@@ -432,6 +432,32 @@ input:checked+.slider:before {
     }
 }
 
+/* Magic Dice Section */
+.magic-dice-section {
+    margin-bottom: var(--space-xl);
+    background: var(--color-surface);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.magic-dice-section h2 {
+    font-size: 1.25rem;
+    font-weight: normal;
+    margin: 0;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.magic-dice-value {
+    font-size: var(--size-step-5);
+    font-weight: 800;
+    color: var(--color-brand);
+    line-height: 1;
+}
+
 /* Inventory Section */
 .inventory-section {
     margin-top: var(--space-xl);
