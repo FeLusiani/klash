@@ -11,6 +11,7 @@ export interface Character {
     abilities: Record<string, AbilityValue>;
     maxHp: number;
     currentHp: number;
+    currentWounds: number;
     hp?: number; // @deprecated
     inventory?: string[];
     createdAt: number;

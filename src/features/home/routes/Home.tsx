@@ -38,6 +38,9 @@ export const Home: React.FC = () => {
                                         <div className="hp-preview">
                                             HP: {char.currentHp ?? char.hp ?? 0}/{char.maxHp ?? char.hp ?? 0}
                                         </div>
+                                        <div className="wounds-preview">
+                                            W: {char.currentWounds ?? 0}/{(char.abilities.STR.max.match(/d(\d+)/)?.[1] || 6)}
+                                        </div>
                                         {Object.entries(char.abilities).map(([code, ability]) => (
                                             <span key={code} className="stat-badge">
                                                 {code}: {ability.max}

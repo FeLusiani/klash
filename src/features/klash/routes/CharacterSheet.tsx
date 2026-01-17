@@ -44,6 +44,12 @@ export const CharacterSheet: React.FC = () => {
     const maxHp = character?.maxHp ?? character?.hp ?? 0;
     const currentHp = character?.currentHp ?? character?.hp ?? 0;
 
+    // Calculate max wounds from STR die
+    const strDie = character?.abilities?.STR?.max || 'd6';
+    const maxWoundsMatch = strDie.match(/d(\d+)/);
+    const maxWounds = maxWoundsMatch ? parseInt(maxWoundsMatch[1], 10) : 6;
+    const currentWounds = character?.currentWounds ?? 0;
+
     const updateHp = async (newHp: number) => {
         if (!character?.id) return;
         try {
@@ -51,6 +57,16 @@ export const CharacterSheet: React.FC = () => {
             await db.characters.update(character.id, { currentHp: newHp });
         } catch (error) {
             console.error('Failed to update HP:', error);
+        }
+    };
+
+    const updateWounds = async (newWounds: number) => {
+        if (!character?.id) return;
+        try {
+            if (newWounds < 0 || newWounds > maxWounds) return;
+            await db.characters.update(character.id, { currentWounds: newWounds });
+        } catch (error) {
+            console.error('Failed to update Wounds:', error);
         }
     };
 
@@ -180,26 +196,50 @@ export const CharacterSheet: React.FC = () => {
 
 
 
-                    <div className="hp-control">
-                        <button
-                            className="hp-btn"
-                            onClick={() => updateHp(currentHp - 1)}
-                            disabled={currentHp <= 0}
-                        >
-                            -
-                        </button>
-                        <div className="hp-display">
-                            <span className="hp-label">HP</span>
-                            <span className="hp-value">{currentHp}</span>
-                            <span className="hp-max">/ {maxHp}</span>
+                    <div className="stats-row">
+                        <div className="hp-control">
+                            <button
+                                className="stat-btn"
+                                onClick={() => updateHp(currentHp - 1)}
+                                disabled={currentHp <= 0}
+                            >
+                                -
+                            </button>
+                            <div className="hp-display">
+                                <span className="stat-label">HP</span>
+                                <span className="stat-value">{currentHp}</span>
+                                <span className="stat-max">/ {maxHp}</span>
+                            </div>
+                            <button
+                                className="stat-btn"
+                                onClick={() => updateHp(currentHp + 1)}
+                                disabled={currentHp >= maxHp}
+                            >
+                                +
+                            </button>
                         </div>
-                        <button
-                            className="hp-btn"
-                            onClick={() => updateHp(currentHp + 1)}
-                            disabled={currentHp >= maxHp}
-                        >
-                            +
-                        </button>
+
+                        <div className="wounds-control">
+                            <button
+                                className="stat-btn"
+                                onClick={() => updateWounds(currentWounds - 1)}
+                                disabled={currentWounds <= 0}
+                            >
+                                -
+                            </button>
+                            <div className="wounds-display">
+                                <span className="stat-label">Wounds</span>
+                                <span className="stat-value">{currentWounds}</span>
+                                <span className="stat-max">/ {maxWounds}</span>
+                            </div>
+                            <button
+                                className="stat-btn"
+                                onClick={() => updateWounds(currentWounds + 1)}
+                                disabled={currentWounds >= maxWounds}
+                            >
+                                +
+                            </button>
+                        </div>
                     </div>
                 </header>
 

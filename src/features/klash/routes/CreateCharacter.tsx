@@ -52,6 +52,7 @@ export const CreateCharacter: React.FC = () => {
                 abilities: formattedAbilities as any, // Dexie will handle the object
                 maxHp: hp,
                 currentHp: hp,
+                currentWounds: 0,
                 createdAt: Date.now()
             });
             navigate(`/characters/${id}`);

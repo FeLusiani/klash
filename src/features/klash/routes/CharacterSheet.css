@@ -126,16 +126,25 @@
     opacity: 0.8;
 }
 
-/* HP Controls */
-.hp-control {
+/* Stats Row (HP & Wounds) */
+.stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xl);
+    margin-top: var(--space-sm);
+}
+
+.hp-control,
+.wounds-control {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-md);
-    margin-top: var(--space-sm);
 }
 
-.hp-btn {
+.stat-btn {
     background: var(--color-surface);
     border: 1px solid rgba(0, 0, 0, 0.1);
     color: var(--color-text-main);
@@ -151,21 +160,21 @@
     transition: all 0.1s;
 }
 
-.hp-btn:active {
+.stat-btn:active {
     transform: scale(0.95);
     background: rgba(0, 0, 0, 0.05);
 }
 
-.hp-btn:disabled {
+.stat-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
 }
 
-.hp-display {
+.hp-display,
+.wounds-display {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: var(--color-danger);
     color: white;
     padding: var(--space-xs) var(--space-lg);
     border-radius: var(--radius-lg);
@@ -173,19 +182,27 @@
     box-shadow: var(--shadow-sm);
 }
 
-.hp-label {
+.hp-display {
+    background: var(--color-success);
+}
+
+.wounds-display {
+    background: var(--color-danger);
+}
+
+.stat-label {
     font-size: 0.75rem;
     opacity: 0.9;
     font-weight: 600;
 }
 
-.hp-value {
+.stat-value {
     font-size: var(--size-step-3);
     font-weight: 800;
     line-height: 1;
 }
 
-.hp-max {
+.stat-max {
     font-size: 0.875rem;
     opacity: 0.9;
 }
