@@ -470,7 +470,7 @@ input:checked+.slider:before {
 .inventory-section {
     margin-top: var(--space-xl);
     background: var(--color-surface);
-    padding: var(--space-lg);
+    padding: var(--space-sm);
     border-radius: var(--radius-lg);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -520,9 +520,9 @@ input:checked+.slider:before {
 
 .inventory-item {
     display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-xs) var(--space-sm);
+    align-items: stretch;
+    gap: var(--space-xs);
+    padding: var(--space-xs);
     background: var(--color-background);
     border-radius: var(--radius-md);
     border: 1px solid transparent;
@@ -533,25 +533,41 @@ input:checked+.slider:before {
     border-color: var(--color-brand);
 }
 
+.inventory-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+}
+
 .inventory-input {
     flex: 1;
     background: transparent;
     border: none;
     color: var(--color-text-main);
     font-size: 0.95rem;
-    padding: var(--space-xs) 0;
+    padding: var(--space-xs) 4px;
     outline: none;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    resize: vertical;
+    min-height: 24px;
+    line-height: 1.4;
+    font-family: inherit;
 }
 
 .inventory-delete-btn {
     background: transparent;
     border: none;
     color: var(--color-text-muted);
-    font-size: 1rem;
+    font-size: 0.875rem;
     cursor: pointer;
     opacity: 0.4;
     transition: opacity 0.2s, color 0.2s;
-    padding: 4px;
+    padding: 2px 4px;
+    line-height: 1;
+    min-height: 16px;
 }
 
 .inventory-item:hover .inventory-delete-btn {
@@ -691,11 +707,11 @@ input:checked+.slider:before {
     }
 
     .sheet-viewport {
-        padding: var(--space-sm);
+        padding: var(--space-xs);
     }
 
     .sheet-container {
-        padding: var(--space-md);
+        padding: var(--space-xs);
         box-shadow: none;
         border: none;
         background: transparent;
