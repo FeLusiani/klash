@@ -250,7 +250,7 @@ export const CharacterSheet: React.FC = () => {
                         initial="enter"
                         animate="center"
                         exit="exit"
-                        transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
+                        transition={{ type: 'tween', duration: 0.15, ease: 'easeInOut' }}
                         className="sheet-container"
                         {...swipeHandlers}
                     >
