@@ -20,6 +20,32 @@
     transform: scale(0.95);
 }
 
+.btn-secondary {
+    background-color: var(--color-surface);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-brand-light);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-secondary:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary:active {
+    transform: scale(0.95);
+}
+
+.character-actions {
+    display: flex;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+    justify-content: flex-start;
+}
+
 .empty-state {
     text-align: center;
     padding: var(--space-2xl) 0;
