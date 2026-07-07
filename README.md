@@ -2,6 +2,8 @@
 
 Offline-first character tracker for the Klash tabletop game. The app stores characters locally in IndexedDB, supports YAML import/export, and works as a PWA when built.
 
+Public app: https://felusiani.github.io/klash/
+
 ## Commands
 
 ```sh
