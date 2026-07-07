@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,6 +34,24 @@ const diceIcons: Record<string, string> = {
     'd20': d20Icon,
 };
 
+const ROLL_ANIMATION_MS = 1000;
+const ROLL_PARTICLE_COUNT = 36;
+
+type RollState =
+    | {
+        status: 'rolling';
+        label: string;
+        die: string;
+        baseDie: string | null;
+    }
+    | {
+        status: 'complete';
+        label: string;
+        die: string;
+        baseDie: string | null;
+        result: RollResult;
+    };
+
 export const CharacterSheet: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -53,9 +71,18 @@ export const CharacterSheet: React.FC = () => {
         return { prevId: prev, nextId: next, currentIndex: index, totalCount: allCharacters.length };
     }, [allCharacters, id]);
 
-    const [lastRoll, setLastRoll] = useState<{ label: string; result: RollResult } | null>(null);
-    const [lastDiceRolled, setLastDiceRolled] = useState<string | null>(null);
+    const [rollState, setRollState] = useState<RollState | null>(null);
+    const rollTimeoutRef = useRef<number | null>(null);
+    const [rollAnimationKey, setRollAnimationKey] = useState(0);
     const [direction, setDirection] = useState<number>(1); // 1 for next, -1 for prev
+
+    useEffect(() => {
+        return () => {
+            if (rollTimeoutRef.current !== null) {
+                window.clearTimeout(rollTimeoutRef.current);
+            }
+        };
+    }, []);
 
     // Swipeable handlers for touch navigation
     const swipeHandlers = useSwipeable({
@@ -137,10 +164,31 @@ export const CharacterSheet: React.FC = () => {
     };
 
     const handleRoll = (code: string, die: string) => {
-        const result = parseAndRoll(die);
-        setLastRoll({ label: code, result });
         const baseDie = die.match(/d\d+/)?.[0] || null;
-        setLastDiceRolled(baseDie);
+        if (rollTimeoutRef.current !== null) {
+            window.clearTimeout(rollTimeoutRef.current);
+        }
+
+        setRollState({ status: 'rolling', label: code, die, baseDie });
+        rollTimeoutRef.current = window.setTimeout(() => {
+            setRollAnimationKey((key) => key + 1);
+            setRollState({
+                status: 'complete',
+                label: code,
+                die,
+                baseDie,
+                result: parseAndRoll(die)
+            });
+            rollTimeoutRef.current = null;
+        }, ROLL_ANIMATION_MS);
+    };
+
+    const closeRollResult = () => {
+        if (rollTimeoutRef.current !== null) {
+            window.clearTimeout(rollTimeoutRef.current);
+            rollTimeoutRef.current = null;
+        }
+        setRollState(null);
     };
 
     const handleDelete = async () => {
@@ -220,6 +268,60 @@ export const CharacterSheet: React.FC = () => {
                         />
                     ))}
                 </div>
+                {rollState && (
+                    <div className={`roll-result ${rollState.status === 'rolling' ? 'rolling' : ''}`}>
+                        <button
+                            className="roll-close-btn"
+                            onClick={closeRollResult}
+                            aria-label="Close result"
+                        >
+                            ✕
+                        </button>
+                        <div className="roll-result-container">
+                            {rollState.baseDie && diceIcons[rollState.baseDie] && (
+                                <div className="roll-icon-side">
+                                    <img
+                                        src={diceIcons[rollState.baseDie]}
+                                        alt={rollState.baseDie}
+                                        className="dice-icon-result"
+                                    />
+                                </div>
+                            )}
+                            <div className="roll-info-side" aria-live="polite">
+                                <span className="roll-label">{rollState.label} Check</span>
+                                {rollState.status === 'rolling' ? (
+                                    <>
+                                        <span className="roll-total roll-total-loading" aria-label="Rolling">
+                                            <span className="roll-loader-dot"></span>
+                                            <span className="roll-loader-dot"></span>
+                                            <span className="roll-loader-dot"></span>
+                                        </span>
+                                        <span className="roll-details">Rolling {rollState.die}...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="roll-total roll-total-complete">
+                                            <span className="roll-number">{rollState.result.total}</span>
+                                            <span key={rollAnimationKey} className="roll-particles" aria-hidden="true">
+                                                {Array.from({ length: ROLL_PARTICLE_COUNT }).map((_, index) => (
+                                                    <span
+                                                        key={index}
+                                                        className="roll-particle"
+                                                        style={{
+                                                            '--particle-angle': `${index * 10}deg`,
+                                                            '--particle-distance': `${3.2 + (index % 5) * 0.55}rem`
+                                                        } as React.CSSProperties}
+                                                    />
+                                                ))}
+                                            </span>
+                                        </span>
+                                        <span className="roll-details">{rollState.result.display}</span>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <AnimatePresence mode="wait" initial={false} custom={direction}>
                     <motion.div
                         key={id}
@@ -237,37 +339,6 @@ export const CharacterSheet: React.FC = () => {
                                 <Link to="/" className="back-link">← Back</Link>
                                 <Link to={`/characters/${id}/edit`} className="edit-link">Edit</Link>
                             </div>
-
-                            {lastRoll && (
-                                <div className="roll-result">
-                                    <button
-                                        className="roll-close-btn"
-                                        onClick={() => {
-                                            setLastRoll(null);
-                                            setLastDiceRolled(null);
-                                        }}
-                                        aria-label="Close result"
-                                    >
-                                        ✕
-                                    </button>
-                                    <div className="roll-result-container">
-                                        {lastDiceRolled && diceIcons[lastDiceRolled] && (
-                                            <div className="roll-icon-side">
-                                                <img
-                                                    src={diceIcons[lastDiceRolled]}
-                                                    alt={lastDiceRolled}
-                                                    className="dice-icon-result"
-                                                />
-                                            </div>
-                                        )}
-                                        <div className="roll-info-side">
-                                            <span className="roll-label">{lastRoll.label} Check</span>
-                                            <span className="roll-total">{lastRoll.result.total}</span>
-                                            <span className="roll-details">{lastRoll.result.display}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
 
                             <h1>{character.name}</h1>
 
