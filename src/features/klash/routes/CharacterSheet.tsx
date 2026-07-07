@@ -73,6 +73,8 @@ export const CharacterSheet: React.FC = () => {
 
     const [rollState, setRollState] = useState<RollState | null>(null);
     const rollTimeoutRef = useRef<number | null>(null);
+    const pendingScrollYRef = useRef<number | null>(null);
+    const pendingScrollTargetIdRef = useRef<number | null>(null);
     const [rollAnimationKey, setRollAnimationKey] = useState(0);
     const [direction, setDirection] = useState<number>(1); // 1 for next, -1 for prev
 
@@ -214,9 +216,26 @@ export const CharacterSheet: React.FC = () => {
 
     const navigateTo = (charId: number | null, dir: number = 1) => {
         if (charId) {
+            pendingScrollYRef.current = window.scrollY;
+            pendingScrollTargetIdRef.current = charId;
             setDirection(dir);
             navigate(`/characters/${charId}`);
         }
+    };
+
+    const restorePendingScroll = (characterId: number | undefined) => {
+        if (pendingScrollYRef.current === null || pendingScrollTargetIdRef.current !== characterId) {
+            return;
+        }
+
+        const scrollY = pendingScrollYRef.current;
+        pendingScrollYRef.current = null;
+        pendingScrollTargetIdRef.current = null;
+
+        window.scrollTo({ top: scrollY, behavior: 'auto' });
+        window.requestAnimationFrame(() => {
+            window.scrollTo({ top: scrollY, behavior: 'auto' });
+        });
     };
 
     // Framer Motion variants for directional transitions
@@ -332,6 +351,7 @@ export const CharacterSheet: React.FC = () => {
                         exit="exit"
                         transition={{ type: 'tween', duration: 0.15, ease: 'easeInOut' }}
                         className="sheet-container"
+                        onAnimationComplete={() => restorePendingScroll(character.id)}
                         {...swipeHandlers}
                     >
                         <header className="sheet-header">
