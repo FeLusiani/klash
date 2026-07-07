@@ -149,19 +149,33 @@
 .roll-particle {
     --particle-angle: 0deg;
     --particle-distance: 3.2rem;
+    --particle-color: hsl(48, 100%, 74%);
+    --particle-glow: hsla(48, 100%, 70%, 0.8);
     position: absolute;
     width: 0.75rem;
     height: 0.75rem;
     border-radius: var(--radius-full);
-    background: currentColor;
+    background: var(--particle-color);
     transform: translate(-50%, -50%) rotate(var(--particle-angle)) translateX(0);
-    box-shadow: 0 0 1rem currentColor;
+    box-shadow: 0 0 0.45rem var(--particle-color), 0 0 1.1rem var(--particle-glow);
+    filter: brightness(1.25) saturate(1.15);
+    mix-blend-mode: screen;
     animation: rollParticleBurst 1.05s ease-out both;
+    color-scheme: only light;
+    forced-color-adjust: none;
+}
+
+@supports (mix-blend-mode: plus-lighter) {
+    .roll-particle {
+        mix-blend-mode: plus-lighter;
+    }
 }
 
 .roll-particle:nth-child(even) {
     width: 0.5rem;
     height: 0.5rem;
+    --particle-color: hsl(0, 0%, 100%);
+    --particle-glow: hsla(0, 0%, 100%, 0.82);
     opacity: 0.8;
 }
 
