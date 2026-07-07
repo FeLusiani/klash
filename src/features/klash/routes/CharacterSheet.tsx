@@ -3,12 +3,19 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSwipeable } from 'react-swipeable';
-import { db, type AbilityValue, type InventoryItem } from '../../../lib/db';
+import { db, type InventoryItem } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
 import { parseAndRoll, type RollResult } from '../../../lib/dice';
-// import { useIsMobile } from '../../../hooks/useIsMobile';
-// import { RealisticDiceRoller } from '../components/RealisticDiceRoller';
-import { GAME_CONFIG, type Die } from '../../../config/game';
+import { GAME_CONFIG } from '../../../config/game';
+import {
+    createInventoryItem,
+    dieIndex,
+    dieSides,
+    magicDiceCount as getMagicDiceCount,
+    MAX_INVENTORY_ITEMS,
+    nextItemQuality,
+    normalizeInventoryItem
+} from '../lib/characterHelpers';
 import './CharacterSheet.css';
 
 import d4Icon from '../../../assets/noun-d4.svg';
@@ -62,11 +69,6 @@ export const CharacterSheet: React.FC = () => {
         preventScrollOnSwipe: true,
         delta: 50, // Minimum swipe distance (pixels)
     });
-    // realisticRoll state removed
-    // isRolling removed
-    // const [showDiceOverlay, setShowDiceOverlay] = useState(false);
-    // const [pendingRoll, setPendingRoll] = useState<{ code: string; die: string } | null>(null);
-    // const isMobile = useIsMobile();
 
     // Handle migration/display logic
     const maxHp = character?.maxHp ?? character?.hp ?? 0;
@@ -74,15 +76,12 @@ export const CharacterSheet: React.FC = () => {
 
     // Calculate max wounds from STR die
     const strDie = character?.abilities?.STR?.max || 'd6';
-    const maxWoundsMatch = strDie.match(/d(\d+)/);
-    const maxWounds = maxWoundsMatch ? parseInt(maxWoundsMatch[1], 10) : 6;
+    const maxWounds = dieSides(strDie);
     const currentWounds = character?.currentWounds ?? 0;
 
     // Calculate Magic Dice based on WIL scale in GAME_CONFIG
     const wilDie = character?.abilities?.WIL?.current || 'd4';
-    const d4Index = GAME_CONFIG.dice.indexOf('d4');
-    const currentWilIndex = GAME_CONFIG.dice.indexOf(wilDie as Die);
-    const magicDiceCount = Math.max(0, currentWilIndex - d4Index);
+    const magicDiceCount = getMagicDiceCount(wilDie);
 
     const updateHp = async (newHp: number) => {
         if (!character?.id) return;
@@ -107,13 +106,13 @@ export const CharacterSheet: React.FC = () => {
     const updateAbility = async (code: string, direction: 'up' | 'down') => {
         if (!character?.id || !character.abilities) return;
 
-        const ability = character.abilities[code] as unknown as AbilityValue;
+        const ability = character.abilities[code];
         if (!ability) return;
 
-        const currentDie = ability.current as Die;
-        const maxDie = ability.max as Die;
-        const currentIndex = GAME_CONFIG.dice.indexOf(currentDie);
-        const maxIndex = GAME_CONFIG.dice.indexOf(maxDie);
+        const currentDie = ability.current;
+        const maxDie = ability.max;
+        const currentIndex = dieIndex(currentDie);
+        const maxIndex = dieIndex(maxDie);
 
         let newIndex = currentIndex;
         if (direction === 'up') {
@@ -143,27 +142,6 @@ export const CharacterSheet: React.FC = () => {
         const baseDie = die.match(/d\d+/)?.[0] || null;
         setLastDiceRolled(baseDie);
     };
-
-    /* 
-    const handleRealisticRollComplete = (total: number, _results: any) => {
-        if (!pendingRoll) return;
-        const parsed = parseAndRoll(pendingRoll.die);
-        const rawRoll = total - parsed.modifier;
-
-        setLastRoll({
-            label: pendingRoll.code,
-            result: {
-                ...parsed,
-                roll: rawRoll,
-                total: total,
-                display: `Rolled ${rawRoll} on d${parsed.sides}`
-            }
-        });
-
-        setShowDiceOverlay(false);
-        setPendingRoll(null);
-    };
-    */
 
     const handleDelete = async () => {
         if (!character?.id) return;
@@ -367,7 +345,7 @@ export const CharacterSheet: React.FC = () => {
                                                 e.stopPropagation();
                                                 updateAbility(code, 'down');
                                             }}
-                                            disabled={GAME_CONFIG.dice.indexOf(ability.current as Die) === 0}
+                                            disabled={dieIndex(ability.current) === 0}
                                             aria-label={`Decrease ${code}`}
                                         >
                                             -
@@ -378,7 +356,7 @@ export const CharacterSheet: React.FC = () => {
                                                 e.stopPropagation();
                                                 updateAbility(code, 'up');
                                             }}
-                                            disabled={GAME_CONFIG.dice.indexOf(ability.current as Die) >= GAME_CONFIG.dice.indexOf(ability.max as Die)}
+                                            disabled={dieIndex(ability.current) >= dieIndex(ability.max)}
                                             aria-label={`Increase ${code}`}
                                         >
                                             +
@@ -403,22 +381,20 @@ export const CharacterSheet: React.FC = () => {
                                     onClick={async () => {
                                         if (!character?.id) return;
                                         const currentInventory = character.inventory || [];
-                                        if (currentInventory.length >= 10) return;
+                                        if (currentInventory.length >= MAX_INVENTORY_ITEMS) return;
                                         await db.characters.update(character.id, {
-                                            inventory: [...currentInventory, { name: '', quality: 3 }]
+                                            inventory: [...currentInventory, createInventoryItem()]
                                         });
                                     }}
-                                    disabled={(character.inventory || []).length >= 10}
-                                    title="Add item (max 10)"
+                                    disabled={(character.inventory || []).length >= MAX_INVENTORY_ITEMS}
+                                    title={`Add item (max ${MAX_INVENTORY_ITEMS})`}
                                 >
                                     +
                                 </button>
                             </div>
                             <div className="inventory-list">
                                 {(character.inventory || []).map((itemOrString, index) => {
-                                    const item: InventoryItem = typeof itemOrString === 'string'
-                                        ? { name: itemOrString, quality: 3 }
-                                        : itemOrString;
+                                    const item: InventoryItem = normalizeInventoryItem(itemOrString);
 
                                     return (
                                         <div key={index} className="inventory-item">
@@ -443,9 +419,10 @@ export const CharacterSheet: React.FC = () => {
                                                     onClick={async () => {
                                                         if (!character?.id) return;
                                                         const newInventory = [...(character.inventory || [])];
-                                                        const currentQuality = item.quality;
-                                                        const newQuality = currentQuality === 0 ? 3 : currentQuality - 1;
-                                                        newInventory[index] = { ...item, quality: newQuality };
+                                                        newInventory[index] = {
+                                                            ...item,
+                                                            quality: nextItemQuality(item.quality)
+                                                        };
                                                         await db.characters.update(character.id, {
                                                             inventory: newInventory
                                                         });
@@ -496,16 +473,6 @@ export const CharacterSheet: React.FC = () => {
                     </motion.div>
                 </AnimatePresence>
             </div>
-
-            {/* 
-            {showDiceOverlay && pendingRoll && (
-                <RealisticDiceRoller
-                    dieType={pendingRoll.die}
-                    onRollComplete={handleRealisticRollComplete}
-                    onClose={() => setShowDiceOverlay(false)}
-                />
-            )}
-            */}
         </Layout>
     );
 };

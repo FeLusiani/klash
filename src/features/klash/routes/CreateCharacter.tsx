@@ -1,30 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../../../lib/db';
-import { GAME_CONFIG, type Die } from '../../../config/game';
+import { GAME_CONFIG } from '../../../config/game';
 import { Layout } from '../../../components/Layout/Layout';
 import { DiceSelector } from '../components/DiceSelector';
-import './CreateCharacter.css';
+import { buildAbilityValues, createDefaultAbilityDice } from '../lib/characterHelpers';
+import './CharacterForm.css';
 
 export const CreateCharacter: React.FC = () => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const errorRef = React.useRef<HTMLDivElement>(null);
+    const errorRef = useRef<HTMLDivElement>(null);
     const [hp, setHp] = useState(4);
+    const [abilities, setAbilities] = useState(createDefaultAbilityDice);
 
-    // Focus error message when it appears
-    React.useEffect(() => {
+    useEffect(() => {
         if (error && errorRef.current) {
             errorRef.current.focus();
         }
     }, [error]);
-
-    const [abilities, setAbilities] = useState<Record<string, Die>>({
-        STR: 'd6',
-        DEX: 'd6',
-        WIL: 'd6'
-    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,14 +37,9 @@ export const CreateCharacter: React.FC = () => {
                 return;
             }
 
-            const formattedAbilities = Object.entries(abilities).reduce((acc, [code, value]) => ({
-                ...acc,
-                [code]: { current: value, max: value }
-            }), {});
-
             const id = await db.characters.add({
                 name: name.trim(),
-                abilities: formattedAbilities as any, // Dexie will handle the object
+                abilities: buildAbilityValues(abilities),
                 maxHp: hp,
                 currentHp: hp,
                 currentWounds: 0,
@@ -69,9 +59,9 @@ export const CreateCharacter: React.FC = () => {
 
     return (
         <Layout>
-            <div className="create-container">
+            <div className="character-form-container">
                 <h1>New Character</h1>
-                <form onSubmit={handleSubmit}>
+                <form className="character-form" onSubmit={handleSubmit}>
                     {error && (
                         <div
                             className="error-message"
@@ -82,7 +72,7 @@ export const CreateCharacter: React.FC = () => {
                             {error}
                         </div>
                     )}
-                    <div className="form-group">
+                    <div className="character-form-group">
                         <label htmlFor="name">Character Name</label>
                         <input
                             id="name"
@@ -95,7 +85,7 @@ export const CreateCharacter: React.FC = () => {
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="character-form-group">
                         <label htmlFor="hp">Hit Points (1-8)</label>
                         <input
                             id="hp"
@@ -120,11 +110,11 @@ export const CreateCharacter: React.FC = () => {
                         ))}
                     </div>
 
-                    <div className="actions">
-                        <button type="button" className="btn-secondary" onClick={() => navigate(-1)}>
+                    <div className="form-actions">
+                        <button type="button" className="form-btn secondary" onClick={() => navigate(-1)}>
                             Cancel
                         </button>
-                        <button type="submit" className="btn-primary">
+                        <button type="submit" className="form-btn primary">
                             Create Character
                         </button>
                     </div>

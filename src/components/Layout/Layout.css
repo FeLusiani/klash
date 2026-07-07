@@ -20,22 +20,6 @@
     text-decoration: none;
 }
 
-.layout-nav {
-    display: flex;
-    gap: var(--space-md);
-}
-
-.layout-nav a {
-    color: var(--color-text-muted);
-    font-weight: 500;
-    transition: color 0.2s;
-}
-
-.layout-nav a:hover {
-    color: var(--color-brand);
-    text-decoration: none;
-}
-
 .layout-main {
     flex: 1;
     padding: var(--space-lg);

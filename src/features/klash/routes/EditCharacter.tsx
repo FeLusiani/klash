@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../../../lib/db';
-import { GAME_CONFIG, type Die } from '../../../config/game';
+import { GAME_CONFIG } from '../../../config/game';
 import { Layout } from '../../../components/Layout/Layout';
 import { DiceSelector } from '../components/DiceSelector';
-import './EditCharacter.css';
+import {
+    clampAbilityValuesToMax,
+    createDefaultAbilityDice,
+    extractAbilityMaxDice
+} from '../lib/characterHelpers';
+import './CharacterForm.css';
 
 export const EditCharacter: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [hp, setHp] = useState(4);
-    const [abilities, setAbilities] = useState<Record<string, Die>>({
-        STR: 'd6',
-        DEX: 'd6',
-        WIL: 'd6'
-    });
+    const [abilities, setAbilities] = useState(createDefaultAbilityDice);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -27,11 +28,7 @@ export const EditCharacter: React.FC = () => {
                 if (char) {
                     setName(char.name);
                     setHp(char.maxHp);
-                    const abs: Record<string, Die> = {};
-                    Object.entries(char.abilities).forEach(([code, value]) => {
-                        abs[code] = value.max as Die;
-                    });
-                    setAbilities(abs);
+                    setAbilities(extractAbilityMaxDice(char.abilities));
                 } else {
                     setError('Character not found');
                 }
@@ -69,20 +66,11 @@ export const EditCharacter: React.FC = () => {
                 return;
             }
 
-            const updatedAbilities = { ...character.abilities };
-            Object.entries(abilities).forEach(([code, maxDie]) => {
-                const currentAbility = updatedAbilities[code];
-                updatedAbilities[code] = {
-                    current: currentAbility ? (GAME_CONFIG.dice.indexOf(currentAbility.current as Die) > GAME_CONFIG.dice.indexOf(maxDie) ? maxDie : currentAbility.current) : maxDie,
-                    max: maxDie
-                };
-            });
-
             await db.characters.update(charId, {
                 name: name.trim(),
                 maxHp: hp,
                 currentHp: Math.min(character.currentHp, hp),
-                abilities: updatedAbilities
+                abilities: clampAbilityValuesToMax(character.abilities, abilities)
             });
 
             navigate(`/characters/${id}`);
@@ -95,7 +83,7 @@ export const EditCharacter: React.FC = () => {
     if (loading) {
         return (
             <Layout>
-                <div className="edit-container">
+                <div className="character-form-container">
                     <p>Loading...</p>
                 </div>
             </Layout>
@@ -104,12 +92,12 @@ export const EditCharacter: React.FC = () => {
 
     return (
         <Layout>
-            <div className="edit-container">
+            <div className="character-form-container">
                 <h1>Edit Character</h1>
-                <form onSubmit={handleSubmit}>
+                <form className="character-form" onSubmit={handleSubmit}>
                     {error && <div className="error-message">{error}</div>}
 
-                    <div className="form-group">
+                    <div className="character-form-group">
                         <label htmlFor="name">Character Name</label>
                         <input
                             id="name"
@@ -120,7 +108,7 @@ export const EditCharacter: React.FC = () => {
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="character-form-group">
                         <label htmlFor="hp">Max Hit Points</label>
                         <input
                             id="hp"
@@ -146,11 +134,11 @@ export const EditCharacter: React.FC = () => {
                         ))}
                     </div>
 
-                    <div className="actions">
-                        <button type="button" className="btn-secondary" onClick={() => navigate(-1)}>
+                    <div className="form-actions">
+                        <button type="button" className="form-btn secondary" onClick={() => navigate(-1)}>
                             Cancel
                         </button>
-                        <button type="submit" className="btn-primary">
+                        <button type="submit" className="form-btn primary">
                             Save Changes
                         </button>
                     </div>

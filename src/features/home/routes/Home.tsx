@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as yaml from 'js-yaml';
 import { db, type Character } from '../../../lib/db';
 import { Layout } from '../../../components/Layout/Layout';
+import { dieSides } from '../../klash/lib/characterHelpers';
 import './Home.css';
 
 export const Home: React.FC = () => {
@@ -17,8 +18,14 @@ export const Home: React.FC = () => {
             return;
         }
 
-        // Remove id and createdAt fields for cleaner export
-        const exportData = characters.map(({ id, createdAt, ...rest }) => rest);
+        const exportData = characters.map((character) => ({
+            name: character.name,
+            abilities: character.abilities,
+            maxHp: character.maxHp,
+            currentHp: character.currentHp,
+            currentWounds: character.currentWounds,
+            inventory: character.inventory ?? []
+        }));
 
         const yamlContent = yaml.dump(exportData);
         const blob = new Blob([yamlContent], { type: 'text/yaml' });
@@ -49,10 +56,9 @@ export const Home: React.FC = () => {
                 return;
             }
 
-            // Get existing character names
             const existingNames = new Set(characters?.map(c => c.name) || []);
+            let importedCount = 0;
 
-            // Process each imported character
             for (const char of importedCharacters) {
                 if (!char.name || !char.abilities) {
                     console.warn('Skipping invalid character:', char);
@@ -90,9 +96,10 @@ export const Home: React.FC = () => {
                     inventory: char.inventory ?? [],
                     createdAt: Date.now()
                 });
+                importedCount++;
             }
 
-            alert(`Successfully imported ${importedCharacters.length} character(s)`);
+            alert(`Successfully imported ${importedCount} character(s)`);
         } catch (error) {
             console.error('Error importing characters:', error);
             alert('Error importing characters. Please check the file format.');
@@ -159,7 +166,7 @@ export const Home: React.FC = () => {
                                                     HP: {char.currentHp ?? char.hp ?? 0}/{char.maxHp ?? char.hp ?? 0}
                                                 </div>
                                                 <div className="wounds-preview">
-                                                    W: {char.currentWounds ?? 0}/{(char.abilities.STR.max.match(/d(\d+)/)?.[1] || 6)}
+                                                    W: {char.currentWounds ?? 0}/{dieSides(char.abilities.STR?.max ?? 'd6')}
                                                 </div>
                                             </div>
                                             <div className="stats-abilities">

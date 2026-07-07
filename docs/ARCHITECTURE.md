@@ -1,23 +1,11 @@
-# Architecture & Tech Stack
+# Architecture
 
-## Core Technologies
-- **Framework**: React (Vite template)
-- **Language**: TypeScript
-- **State/Storage**: Dexie.js (IndexDB wrapper) for offline-first data.
-- **PWA**: `vite-plugin-pwa` for service worker and manifest generation.
+Klash is a Vite, React, and TypeScript PWA.
 
-## Directory Structure
-- `src/features/`: Contains domain-specific logic (e.g., `todos`, `users`).
-    - Each feature folder has: `api`, `components`, `hooks`, `routes`, `types`.
-- `src/components/`: Shared UI components (generic buttons, inputs).
-- `src/lib/`: Third-party library configurations (e.g., `db.ts` for Dexie).
-- `src/styles/`: Global CSS using variables for theming.
+- `src/routes/` defines app routes.
+- `src/features/home/` lists, imports, and exports characters.
+- `src/features/klash/` contains character creation, editing, sheet UI, dice selectors, and game helpers.
+- `src/lib/db.ts` owns the Dexie IndexedDB schema.
+- `src/config/game.ts` defines abilities, dice progression, and data-version resets.
 
-## Styling Strategy
-- **Vanilla CSS**: No frameworks.
-- **Variables**: Defined in `src/styles/variables.css` for easy theming (HSL colors).
-- **Reset**: Modern reset in `src/styles/reset.css`.
-
-## Offline Strategy
-- Data is persisted in IndexDB via Dexie.
-- Service Worker caches assets for offline load.
+Styling is plain global CSS. Shared theme values live in `src/styles/variables.css`; route-specific styles sit next to the route that imports them.

@@ -13,15 +13,12 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="layout-brand">
                     <Link to="/">Klash</Link>
                 </div>
-                <nav className="layout-nav">
-                    <Link to="/todos">Todos</Link>
-                </nav>
             </header>
             <main className="layout-main">
                 {children}
             </main>
             <footer className="layout-footer">
-                <p>&copy; {new Date().getFullYear()} Offline App</p>
+                <p>&copy; {new Date().getFullYear()} Klash</p>
             </footer>
         </div>
     );
